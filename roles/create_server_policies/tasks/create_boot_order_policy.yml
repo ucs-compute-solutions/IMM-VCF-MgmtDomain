@@ -1,0 +1,47 @@
+---
+# Boot order policy that allows:
+# 1. KVM mapped DVD
+# 2. Local Disk (M.2 drive tested)
+#
+- name: "Boot Order Policy for VCF Mgmt Domain Hosts"
+  vars:
+    api_info: &api_info_vcf
+      api_private_key: "{{ api_private_key }}"
+      api_key_id: "{{ api_key_id }}"
+      api_uri: "{{ api_uri | default(omit) }}"
+      validate_certs: "{{ validate_certs | default(omit) }}"
+      state: "{{ state | default(omit) }}"
+  block:
+  -    cisco.intersight.intersight_rest_api:
+          <<: *api_info_vcf
+          resource_path: /boot/PrecisionPolicies
+          query_params:
+             $filter: "Name eq '{{ boot_order_policy_name }}'"
+          api_body: {
+            "Name": "{{ boot_order_policy_name }}",
+            "Description": "{{ boot_order_policy_description }}",
+
+            "Organization": {
+               "Moid": "{{ intersight_org.api_response.Moid }}"
+             },
+            Tags: [{Key: "configmode", Value: "ansible"},{Key: "prefix", Value: "{{ prefix }}"}],
+
+             "ConfiguredBootMode": "{{ boot_mode }}",
+             "EnforceUefiSecureBoot": "{{ enable_uefi_secureboot|bool }}",
+             "BootDevices": [
+                  {
+                     "Name": "KVM-Mapped-ISO",
+                     "Subtype": "kvm-mapped-dvd",
+                     "Enabled": true,
+                     "ObjectType": "boot.VirtualMedia"
+                  },
+                  {
+                     "Name": "Local-Boot",
+                     "Enabled": true,
+                     "ObjectType": "boot.LocalDisk"
+                  }
+             ]
+
+            }
+       register: boot_policy
+
