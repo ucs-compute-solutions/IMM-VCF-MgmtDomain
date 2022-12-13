@@ -57,5 +57,6 @@ To execute the playbooks, you will need to follow these steps:
 11. Install ESXi on the 4 servers and configure the management interface to be able to access ESXi hosts
 12. Execute the prepare_esxi_host.yml playbook to prep the ESXi hosts `ansible-playbook ./prepare_esxi_hosts.yml -i inventory`
 13. Regenerate the self signed certificates on all 4 ESXi hosts manually or use the playbook: `ansible-playbook ./regenerate_esxi_hosts_certs.yml -i inventory`
+14. Update enic or fnic drivers if applicable (please consult the associated CVD)
 
 At this time, ESXi servers will be ready for VCF cloud builder to setup the management domain. 
